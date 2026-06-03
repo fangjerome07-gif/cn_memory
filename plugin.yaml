@@ -1,0 +1,7 @@
+name: cn_memory
+version: "4.0.0"
+description: "Hybrid retrieval memory: vector + BM25 (FTS5) + time decay + importance, with entity extraction and lifecycle management."
+pip_dependencies:
+  - "numpy"
+requires_env: []
+hooks: []
