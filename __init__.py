@@ -117,6 +117,7 @@ class CnMemoryProvider(MemoryProvider):
         self._llm_model = os.getenv("CN_MEMORY_LLM_MODEL", "").strip()
         self._llm_key_env = os.getenv("CN_MEMORY_LLM_KEY_ENV", "").strip()
         self._llm_api_key = os.getenv("CN_MEMORY_LLM_API_KEY", "").strip()
+        self._embedding_api_key = os.getenv("CN_MEMORY_EMBEDDING_API_KEY", "").strip() or os.getenv("CN_MEMORY_LLM_API_KEY", "").strip()
         try:
             self._llm_timeout = max(1.0, float(os.getenv("CN_MEMORY_LLM_TIMEOUT", "8")))
         except ValueError:
@@ -558,10 +559,13 @@ class CnMemoryProvider(MemoryProvider):
         if not prepared:
             return None
         try:
+            headers = {"Content-Type": "application/json"}
+            if self._embedding_api_key:
+                headers["Authorization"] = f"Bearer {self._embedding_api_key}"
             req = urllib.request.Request(
                 self._endpoint,
                 data=json.dumps({"input": prepared, "model": self._model}).encode('utf-8'),
-                headers={"Content-Type": "application/json", "Authorization": "Bearer no-key"},
+                headers=headers,
                 method="POST"
             )
             with self._local_opener.open(req, timeout=3.0) as response:
